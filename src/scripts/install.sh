@@ -7,7 +7,7 @@ GetDownloadUrl() {
 }
 
 Install() {
-    DCTL_NO_VERSION_CHECK="true"
+    export DCTL_NO_VERSION_CHECK="true"
     BASE_URL=$(GetDownloadUrl)
     KEY="${PARAM_GOOS}_${PARAM_GOARCH}"
     echo "Downloading from ${BASE_URL}/driftctl_${KEY}"
