@@ -1,0 +1,9 @@
+description: Run driftctl latest version
+usage:
+  version: 2.1
+  orbs:
+    driftctl: cloudskiff/driftctl
+  workflows:
+    driftctl:
+      jobs:
+        - driftctl/run

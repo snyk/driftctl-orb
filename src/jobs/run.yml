@@ -1,0 +1,10 @@
+description: Run driftctl
+executor: default
+parameters:
+  version:
+    type: string
+    default: ""
+    description: "Which version of driftctl to install"
+steps:
+  - install:
+      version: << parameters.version >>
