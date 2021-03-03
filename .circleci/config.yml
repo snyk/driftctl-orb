@@ -31,10 +31,15 @@ jobs:
       - driftctl/install
   integration-test_install-specific-version:
     executor: driftctl/default
+    environment:
+      DCTL_NO_VERSION_CHECK: 'true'
     steps:
       - checkout
       - driftctl/install:
           version: v0.4.0
+      - run:
+          name: Verify installed version
+          command: driftctl version | grep 'v0.4.0'
 workflows:
   # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
   # This workflow will run on every commit

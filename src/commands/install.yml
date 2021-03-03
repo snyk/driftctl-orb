@@ -23,5 +23,6 @@ steps:
         PARAM_VERSION: <<parameters.version>>
         PARAM_GOOS: <<parameters.os>>
         PARAM_GOARCH: <<parameters.arch>>
+        PARAM_PATH: <<parameters.path>>
       name: Install driftctl <<parameters.version>>
       command: <<include(scripts/install.sh)>>

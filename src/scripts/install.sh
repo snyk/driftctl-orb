@@ -16,7 +16,7 @@ Install() {
     curl -sL "${BASE_URL}/driftctl_SHA256SUMS.gpg" -o driftctl_SHA256SUMS.gpg
     sha256sum --ignore-missing -c driftctl_SHA256SUMS
     chmod +x "driftctl_${KEY}"
-    mv "driftctl_${KEY}" "${PARAM_PATH}/driftctl"
+    sudo mv "driftctl_${KEY}" "${PARAM_PATH}/driftctl"
     echo "Installed version $("${PARAM_PATH}"/driftctl version)"
 }
 
