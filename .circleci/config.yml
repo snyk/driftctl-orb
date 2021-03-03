@@ -25,17 +25,16 @@ parameters:
 jobs:
   # Define one or more jobs which will utilize your orb's commands and parameters to validate your changes.
   integration-test_install-latest:
-    #executor: driftctl/default
-    docker:
-      - image: cimg/base:stable
+    executor: driftctl/default
     steps:
       - checkout
+      - driftctl/install
   integration-test_install-specific-version:
-    #executor: driftctl/default
-    docker:
-      - image: cimg/base:stable
+    executor: driftctl/default
     steps:
       - checkout
+      - driftctl/install:
+          version: v0.4.0
 workflows:
   # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
   # This workflow will run on every commit
