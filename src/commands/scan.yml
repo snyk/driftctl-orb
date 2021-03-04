@@ -1,0 +1,4 @@
+description: Run driftctl scan
+steps:
+  - run:
+      command: driftctl scan
