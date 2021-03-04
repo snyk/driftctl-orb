@@ -24,11 +24,17 @@ parameters:
 
 jobs:
   # Define one or more jobs which will utilize your orb's commands and parameters to validate your changes.
-  integration-test_install-latest:
+  integration-test:
+    environment:
+      DCTL_NO_VERSION_CHECK: 'true'
+      DCTL_FILTER: "Type=='unknown_type'" # Makes driftctl to exit 0 each time
+      AWS_DEFAULT_REGION: 'us-east-1'
+      DCTL_FROM: 'tfstate://tests/terraform.tfstate'
     executor: driftctl/default
     steps:
       - checkout
       - driftctl/install
+      - driftctl/scan
   integration-test_install-specific-version:
     executor: driftctl/default
     environment:
@@ -85,7 +91,8 @@ workflows:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
       # Run any integration tests defined within the `jobs` key.
-      - integration-test_install-latest
+      - integration-test:
+          context: driftctl-acc
       - integration-test_install-specific-version
       # Publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
@@ -100,7 +107,7 @@ workflows:
           fail-if-semver-not-indicated: true
           publish-version-tag: false
           requires:
-             - integration-test_install-latest
+             - integration-test
              - integration-test_install-specific-version
           filters:
             branches:
