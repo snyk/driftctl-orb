@@ -5,6 +5,15 @@ parameters:
     type: string
     default: ""
     description: "Which version of driftctl to install"
+  checkout:
+    type: boolean
+    default: false
+    description: "Perform checkout as first step in job."
 steps:
+  - when:
+      condition: << parameters.checkout >>
+      steps:
+        - checkout
   - install:
       version: << parameters.version >>
+  - scan
