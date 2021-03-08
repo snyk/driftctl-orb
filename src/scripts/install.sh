@@ -1,23 +1,23 @@
-GetDownloadUrl() {
-    BASE_URL="https://github.com/cloudskiff/driftctl/releases/latest/download"
+GetVersion() {
     if [ -n "${PARAM_VERSION}" ]; then
-        BASE_URL="https://github.com/cloudskiff/driftctl/releases/download/${PARAM_VERSION}"
+      echo -n "${PARAM_VERSION}"
+    else
+      echo -n "latest"
     fi
-    echo "${BASE_URL}"
 }
 
 Install() {
     export DCTL_NO_VERSION_CHECK="true"
-    BASE_URL=$(GetDownloadUrl)
-    KEY="${PARAM_GOOS}_${PARAM_GOARCH}"
-    echo "Downloading from ${BASE_URL}/driftctl_${KEY}"
-    curl -sL "${BASE_URL}/driftctl_${KEY}" -o "driftctl_${KEY}"
-    curl -sL "${BASE_URL}/driftctl_SHA256SUMS" -o driftctl_SHA256SUMS
-    curl -sL "${BASE_URL}/driftctl_SHA256SUMS.gpg" -o driftctl_SHA256SUMS.gpg
-    sha256sum --ignore-missing -c driftctl_SHA256SUMS
-    chmod +x "driftctl_${KEY}"
-    sudo mv "driftctl_${KEY}" "${PARAM_PATH}/driftctl"
-    echo "Installed version $("${PARAM_PATH}"/driftctl version)"
+    BINPATH="${HOME}/.dctlenv/bin"
+    gpg --import cloudskiff_pubkey.pem
+    if [ ! -d "${HOME}/.dctlenv" ]; then
+      git clone --depth 1 --branch v0.1.3 https://github.com/wbeuil/dctlenv ~/.dctlenv
+    fi
+    VERSION=$(GetVersion)
+    DCTLENV_PGP=1 "${BINPATH}/dctlenv" use "${VERSION}"
+    if [ ! -e /usr/local/bin/driftctl ]; then
+      sudo ln -s "${BINPATH}/driftctl" /usr/local/bin/driftctl
+    fi
 }
 
 # Will not run if sourced for bats-core tests.

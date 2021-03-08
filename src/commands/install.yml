@@ -5,24 +5,9 @@ parameters:
     type: string
     default: ""
     description: "Which version of driftctl to install"
-  path:
-    type: string
-    default: "/usr/local/bin"
-    description: "Where to install driftctl binary"
-  os:
-    type: string
-    default: "linux"
-    description: "If your are using a non standard executor, should match its GOOS code"
-  arch:
-    type: string
-    default: "amd64"
-    description: "If your are using a non standard executor, should match its GOARCH code"
 steps:
   - run:
       environment:
         PARAM_VERSION: <<parameters.version>>
-        PARAM_GOOS: <<parameters.os>>
-        PARAM_GOARCH: <<parameters.arch>>
-        PARAM_PATH: <<parameters.path>>
       name: Install driftctl <<parameters.version>>
       command: <<include(scripts/install.sh)>>
