@@ -2,7 +2,7 @@ description: Run driftctl version v0.4.0
 usage:
   version: 2.1
   orbs:
-    driftctl: cloudskiff/driftctl
+    driftctl: snyk/driftctl
   workflows:
     driftctl:
       jobs:

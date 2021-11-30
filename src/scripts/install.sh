@@ -9,7 +9,7 @@ GetVersion() {
 Install() {
     export DCTL_NO_VERSION_CHECK="true"
     BINPATH="${HOME}/.dctlenv/bin"
-    gpg --import cloudskiff_pubkey.pem
+    gpg --import driftctl_pubkey.pem
     if [ ! -d "${HOME}/.dctlenv" ]; then
       git clone --depth 1 --branch v0.1.3 https://github.com/wbeuil/dctlenv ~/.dctlenv
     fi
