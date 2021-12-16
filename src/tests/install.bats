@@ -13,9 +13,21 @@ setup() {
     [ "$(GetVersion)" == "latest" ]
 }
 
-@test '3: test install' {
+@test '3: test install driftctl v0.5.0' {
     export PARAM_VERSION="v0.5.0"
     Install
     [ "$(which driftctl)" == "/usr/local/bin/driftctl" ]
     [ "$(driftctl version)" == "v0.5.0" ]
+}
+
+@test '3: test install driftctl v0.16.0' {
+    export PARAM_VERSION="v0.16.0"
+    Install
+    [ "$(which driftctl)" == "/usr/local/bin/driftctl" ]
+    [ "$(driftctl version)" == "v0.16.0" ]
+}
+
+@test '3: test install driftctl latest' {
+    Install
+    [ "$(which driftctl)" == "/usr/local/bin/driftctl" ]
 }
