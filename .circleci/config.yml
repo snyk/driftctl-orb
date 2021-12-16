@@ -25,10 +25,10 @@ jobs:
   # Define one or more jobs which will utilize your orb's commands and parameters to validate your changes.
   integration-test:
     environment:
-      DCTL_NO_VERSION_CHECK: 'true'
+      DCTL_NO_VERSION_CHECK: "true"
       DCTL_FILTER: "Type=='unknown_type'" # Makes driftctl to exit 0 each time
-      AWS_DEFAULT_REGION: 'us-east-1'
-      DCTL_FROM: 'tfstate://tests/terraform.tfstate'
+      AWS_DEFAULT_REGION: "us-east-1"
+      DCTL_FROM: "tfstate://tests/terraform.tfstate"
     executor: driftctl/default
     steps:
       - checkout
@@ -37,7 +37,7 @@ jobs:
   integration-test_install-specific-version:
     executor: driftctl/default
     environment:
-      DCTL_NO_VERSION_CHECK: 'true'
+      DCTL_NO_VERSION_CHECK: "true"
     steps:
       - checkout
       - driftctl/install:
@@ -50,6 +50,7 @@ jobs:
       - run:
           name: Verify installed version
           command: driftctl version | grep 'v0.5.0'
+
 workflows:
   # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
   # This workflow will run on every commit
@@ -78,7 +79,8 @@ workflows:
       - orb-tools/publish-dev:
           orb-name: snyk/driftctl
           context: orb-publishing # A restricted context containing your private publishing credentials. Will only execute if approved by an authorized user.
-          requires: [hold-for-dev-publish]
+          requires:
+            - hold-for-dev-publish
       # Trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
       - orb-tools/trigger-integration-tests-workflow:
@@ -109,10 +111,11 @@ workflows:
           context: orb-publishing
           add-pr-comment: false
           fail-if-semver-not-indicated: true
-          publish-version-tag: false
+          publish-version-tag: true
+          ssh-fingerprints: a1:aa:89:f4:17:a0:f6:68:66:35:97:36:a7:98:30:44
           requires:
-             - integration-test
-             - integration-test_install-specific-version
+            - integration-test
+            - integration-test_install-specific-version
           filters:
             branches:
               only:
