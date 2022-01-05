@@ -11,7 +11,7 @@ Install() {
 
     BINPATH="${HOME}/.dctlenv/bin"
     if [ ! -d "${HOME}/.dctlenv" ]; then
-      git clone --depth 1 --branch v0.1.7 https://github.com/wbeuil/dctlenv ~/.dctlenv
+      git clone --depth 1 --branch v0.1.8 https://github.com/wbeuil/dctlenv ~/.dctlenv
     fi
 
     VERSION=$(GetVersion)
