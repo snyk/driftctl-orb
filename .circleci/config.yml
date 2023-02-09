@@ -1,123 +1,39 @@
 version: 2.1
-
+setup: true
 orbs:
-  driftctl: snyk/driftctl@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@10.0
-  bats: circleci/bats@1.0
-  shellcheck: circleci/shellcheck@2.0
+  orb-tools: circleci/orb-tools@11.5
+  shellcheck: circleci/shellcheck@3.1
+  bats: circleci/bats@1.1.0
 
-# Pipeline Parameters
-## These parameters are used internally by orb-tools. Skip to the Jobs section.
-parameters:
-  run-integration-tests:
-    description: An internal flag to prevent integration test from running before a development version has been created.
-    type: boolean
-    default: false
-  dev-orb-version:
-    description: >
-      The development version of the orb to test.
-      This value is automatically adjusted by the "trigger-integration-tests-workflow" job to correspond with the specific version created by the commit and should not be edited.
-      A "dev:alpha" version must exist for the initial pipeline run.
-    type: string
-    default: "dev:alpha"
-
-jobs:
-  # Define one or more jobs which will utilize your orb's commands and parameters to validate your changes.
-  integration-test:
-    environment:
-      DCTL_NO_VERSION_CHECK: "true"
-      DCTL_FILTER: "Type=='unknown_type'" # Makes driftctl to exit 0 each time
-      AWS_DEFAULT_REGION: "us-east-1"
-      DCTL_FROM: "tfstate://tests/terraform.tfstate"
-    executor: driftctl/default
-    steps:
-      - checkout
-      - driftctl/install
-      - driftctl/scan
-  integration-test_install-specific-version:
-    executor: driftctl/default
-    environment:
-      DCTL_NO_VERSION_CHECK: "true"
-    steps:
-      - checkout
-      - driftctl/install:
-          version: v0.4.0
-      - run:
-          name: Verify installed version
-          command: driftctl version | grep 'v0.4.0'
-      - driftctl/install:
-          version: 0.5.0
-      - run:
-          name: Verify installed version
-          command: driftctl version | grep 'v0.5.0'
+filters: &filters
+  tags:
+    only: /.*/
 
 workflows:
-  # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
-  # This workflow will run on every commit
-  test-pack:
-    unless: << pipeline.parameters.run-integration-tests >>
+  lint-pack:
     jobs:
-      - orb-tools/lint # Lint Yaml files
-      - orb-tools/pack # Pack orb source
+      - orb-tools/lint:
+          filters: *filters
+      - orb-tools/pack:
+          filters: *filters
+      - orb-tools/review:
+          filters: *filters
       - shellcheck/check:
-          dir: ./src/scripts
           exclude: SC2148
-      # optional: Run BATS tests against your scripts
+          filters: *filters
       - bats/run:
           path: ./src/tests
-      # If you accept building open source forks, protect your secrects behind a restricted context.
-      # A job containing restricted context (which holds your orb publishing credentials) may only be accessed by a user with proper permissions.
-      # An open source user may begin a pipeline with a PR, and once the pipeline is approved by an authorized user at this point, the pipeline will continue with the proper context permissions.
-      - hold-for-dev-publish:
-          type: approval
-          requires:
-            - orb-tools/lint
-            - orb-tools/pack
-            - bats/run
-            - shellcheck/check
-      # Publish development version(s) of the orb.
-      - orb-tools/publish-dev:
+      - orb-tools/publish:
           orb-name: snyk/driftctl
-          context: orb-publishing # A restricted context containing your private publishing credentials. Will only execute if approved by an authorized user.
+          vcs-type: << pipeline.project.type >>
           requires:
-            - hold-for-dev-publish
-      # Trigger an integration workflow to test the
-      # dev:${CIRCLE_SHA1:0:7} version of your orb
-      - orb-tools/trigger-integration-tests-workflow:
-          name: trigger-integration-dev
+            [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check, bats/run]
+          # Use a context to hold your publishing token.
           context: orb-publishing
-          requires:
-            - orb-tools/publish-dev
-
-  # This `integration-test_deploy` workflow will only run
-  # when the run-integration-tests pipeline parameter is set to true.
-  # It is meant to be triggered by the "trigger-integration-tests-workflow"
-  # job, and run tests on <your orb>@dev:${CIRCLE_SHA1:0:7}.
-  integration-test_deploy:
-    when: << pipeline.parameters.run-integration-tests >>
-    jobs:
-      # Run any integration tests defined within the `jobs` key.
-      - integration-test:
-          context: driftctl-acc
-      - integration-test_install-specific-version
-      # Publish a semver version of the orb. relies on
-      # the commit subject containing the text "[semver:patch|minor|major|skip]"
-      # as that will determine whether a patch, minor or major
-      # version will be published or if publishing should
-      # be skipped.
-      # e.g. [semver:patch] will cause a patch version to be published.
-      - orb-tools/dev-promote-prod-from-commit-subject:
-          orb-name: snyk/driftctl
-          context: orb-publishing
-          add-pr-comment: false
-          fail-if-semver-not-indicated: true
-          publish-version-tag: true
-          ssh-fingerprints: 06:c5:b9:79:15:a6:51:88:17:4c:b4:ea:35:f3:d0:52
-          requires:
-            - integration-test
-            - integration-test_install-specific-version
-          filters:
-            branches:
-              only:
-                - master
-                - main
+          filters: *filters
+      # Triggers the next workflow in the Orb Development Kit.
+      - orb-tools/continue:
+          pipeline-number: << pipeline.number >>
+          vcs-type: << pipeline.project.type >>
+          requires: [orb-tools/publish]
+          filters: *filters
