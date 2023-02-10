@@ -8,6 +8,16 @@ parameters:
 steps:
   - run:
       environment:
+          LEGACY_PUBKEY: <<include(pubkeys/driftctl_legacy_pubkey.pem)>>
+      name: Create driftctl_legacy_pubkey.pem
+      command: /bin/echo "$LEGACY_PUBKEY" > driftctl_legacy_pubkey.pem
+  - run:
+      environment:
+          PUBKEY: <<include(pubkeys/driftctl_pubkey.pem)>>
+      name: Create driftctl_pubkey.pem
+      command: /bin/echo "$PUBKEY" > driftctl_pubkey.pem
+  - run:
+      environment:
         PARAM_VERSION: <<parameters.version>>
       name: Install driftctl <<parameters.version>>
       command: <<include(scripts/install.sh)>>
