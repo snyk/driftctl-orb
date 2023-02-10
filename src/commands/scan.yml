@@ -1,4 +1,5 @@
 description: Run driftctl scan
 steps:
   - run:
+      name: Run driftctl scan
       command: driftctl scan
