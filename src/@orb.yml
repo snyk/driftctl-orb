@@ -1,7 +1,7 @@
 version: 2.1
 
 description: >
-  Official driftctl orb
+  Scan your infrastructure with the official driftctl orb. Detect, track and alert on infrastructure drift.
 # What will your orb allow users to accomplish?
 # Descriptions should be short, simple, and informative.
 
