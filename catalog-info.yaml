@@ -4,8 +4,8 @@ metadata:
   name: driftctl-orb
   annotations:
     github.com/project-slug: snyk/driftctl-orb
-    github.com/team-slug: snyk/cloud-dev-ex
+    github.com/team-slug: snyk/iac
 spec:
   type: supply-chain-tooling
   lifecycle: "-"
-  owner: cloud-dev-ex
+  owner: iac
