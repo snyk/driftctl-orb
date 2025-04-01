@@ -1,7 +1,7 @@
 version: 2.1
 setup: true
 orbs:
-  prodsec: snyk/prodsec-orb@1.0
+  prodsec: snyk/prodsec-orb@1
   orb-tools: circleci/orb-tools@11.5
   shellcheck: circleci/shellcheck@3.1
   bats: circleci/bats@1.1.0
@@ -17,7 +17,7 @@ workflows:
           name: Scan repository for secrets
           context:
             - snyk-bot-slack
-          channel: group-infrastructure-as-code-alerts
+          channel: snyk-vuln-alerts-iac
       - orb-tools/lint:
           filters: *filters
       - orb-tools/pack:
