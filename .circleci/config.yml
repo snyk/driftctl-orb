@@ -17,6 +17,7 @@ workflows:
           name: Scan repository for secrets
           context:
             - snyk-bot-slack
+            - prodsec-orb-runtime
           channel: snyk-vuln-alerts-iac
       - orb-tools/lint:
           filters: *filters
